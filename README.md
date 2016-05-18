@@ -10,6 +10,15 @@ Add the following to your rebar.config:
 { jira, ".*",	{ git, "git://github.com/wrren/jira.erl.git", { branch, "master" } } }
 ```
 
+## Running Tests
+
+Copy ```test/test.config.example``` to ```test/test.config``` and fill in your JIRA credentials and host details.
+
+```erlang
+rebar compile
+rebat eunit ct
+```
+
 ## Examples
 
 ```erlang
