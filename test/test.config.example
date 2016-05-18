@@ -1,0 +1,4 @@
+{ jira_host, 		"" 	}.
+{ jira_port, 		443	}.
+{ jira_username, 	"" 	}.
+{ jira_password, 	"" 	}.

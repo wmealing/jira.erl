@@ -1,0 +1,16 @@
+{ application, jira,
+[
+    { description, "Library for making queries against the JIRA API" },
+    { vsn, "1" },
+    { modules, 
+    [
+        jira
+    ]},
+    { registered, [] },
+    { applications, 
+    [
+        kernel,
+        stdlib
+    ]},
+    { env, [] }
+ ]}.
