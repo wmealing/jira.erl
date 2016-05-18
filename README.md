@@ -12,7 +12,9 @@ Add the following to your rebar.config:
 
 ## Running Tests
 
-Copy ```test/test.config.example``` to ```test/test.config``` and fill in your JIRA credentials and host details.
+Copy ```test/test.config.example``` to ```test/test.config``` and fill in your JIRA credentials and host details. The
+Common Test for searching requires a valid project name under which to search for issues, fill this in under the
+```jira_project``` key. Use of a non-existent project will cause an error to be thrown.
 
 ```erlang
 rebar compile

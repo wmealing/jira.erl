@@ -18,7 +18,7 @@ init_per_suite( Config ) ->
 	
 search_test( Config ) ->
 	State = ?config( jira_state, Config ),
-	{ ok, _Issues, _TotalResults } = jira:search( "project = WEB", 0, 25, ["summary"], State ).
+	{ ok, _Issues, _TotalResults } = jira:search( "project = " ++ ct:get_config( jira_project ), 0, 25, ["summary"], State ).
 	
 end_per_suite( Config ) ->
 	hackney:stop(),
