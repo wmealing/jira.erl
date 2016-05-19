@@ -15,7 +15,8 @@ init_per_suite( Config ) ->
 	State = jira:init( 	ct:get_config( jira_username ),
 						ct:get_config( jira_password ),
 						ct:get_config( jira_host ),
-						ct:get_config( jira_port ) ),
+						ct:get_config( jira_port ),
+						[] ),
 	[ { jira_state, State } | Config ].
 	
 search_test( Config ) ->
