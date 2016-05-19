@@ -1,7 +1,7 @@
 -module( jira ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [init/4, init/3, url/1, search/3, search/5] ).
+-export( [init/4, init/3, url/1, issue/2, search/3, search/5] ).
 
 -record( state, {   username        :: binary(),
                     password        :: binary(),
@@ -30,6 +30,25 @@ init( Username, Password, Host ) ->
 %%
 -spec url( #state{} ) -> string().
 url( #state{ url = URL } ) -> URL.
+
+%%
+%%  Get the issue with the given key
+%%
+-spec issue( string(), #state{} ) -> { ok, issue() } | { error, term() }.
+issue( Key, #state{ url = BaseURL, username = Username, password = Password } ) ->
+    URL = want:binary( url:join( BaseURL, [ "issue", Key ] ) ),
+    Options = [{ basic_auth, { Username, Password } } ],
+    case hackney:get( URL, [], <<>>, Options ) of
+        { ok, 200, _Headers, Ref } ->
+            { ok, ResponseBody } = hackney:body( Ref ),
+            Issue = jsx:decode( ResponseBody, [ return_maps ] ),
+            { ok, Issue };
+        { ok, _Status, _Headers, Ref } ->
+            { ok, ErrorBody } = hackney:body( Ref ),
+            { error, ErrorBody };
+        { error, Reason } ->
+            { error, want:binary( Reason ) }
+    end.
 
 %%
 %%  Search for any issues matching the given JQL string, collect all results by traversing all pages returned
@@ -62,15 +81,15 @@ search( JQL, Start, Max, Fields, #state{ username = Username, password = Passwor
     Options = [{ basic_auth, { Username, Password } } ],
     URL = want:binary( url:join( BaseURL, [ "search" ] ) ),
     case hackney:post( URL, [{ <<"Content-Type">>, <<"application/json">> }], jsx:encode( Body ), Options ) of
-        { ok, 200, _ResponseHeaders, Ref } ->
+        { ok, 200, _Headers, Ref } ->
             { ok, ResponseBody } = hackney:body( Ref ),
             ResponseJSON = jsx:decode( ResponseBody, [ return_maps ] ),
             Total   = maps:get( <<"total">>, ResponseJSON ),
             Issues  = maps:get( <<"issues">>, ResponseJSON ),
             { ok, Issues, Total };
-        { ok, Status, _, Ref } ->
+        { ok, _Status, _Headers, Ref } ->
             { ok, ErrorBody } = hackney:body( Ref ),
-            { error, Status, ErrorBody };
+            { error, ErrorBody };
         { error, Reason } ->
             { error, want:binary( Reason ) }
     end.
