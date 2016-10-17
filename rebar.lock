@@ -1,0 +1,28 @@
+{"1.1.0",
+[{<<"certifi">>,{pkg,<<"certifi">>,<<"0.4.0">>},1},
+ {<<"hackney">>,{pkg,<<"hackney">>,<<"1.6.1">>},0},
+ {<<"idna">>,{pkg,<<"idna">>,<<"1.2.0">>},1},
+ {<<"jsx">>,
+  {git,"git://github.com/talentdeficit/jsx.git",
+       {ref,"3074d4865b3385a050badf7828ad31490d860df5"}},
+  0},
+ {<<"metrics">>,{pkg,<<"metrics">>,<<"1.0.1">>},1},
+ {<<"mimerl">>,{pkg,<<"mimerl">>,<<"1.0.2">>},1},
+ {<<"ssl_verify_fun">>,{pkg,<<"ssl_verify_fun">>,<<"1.1.0">>},1},
+ {<<"url">>,
+  {git,"git://github.com/wrren/url.erl.git",
+       {ref,"5b06334e319da7df5cc52d9c3d54221e4f3156ac"}},
+  0},
+ {<<"want">>,
+  {git,"git://github.com/wrren/want.erl.git",
+       {ref,"9209b5ea898f5b193dff7d8de556ed174cc6ec51"}},
+  0}]}.
+[
+{pkg_hash,[
+ {<<"certifi">>, <<"A7966EFB868B179023618D29A407548F70C52466BF1849B9E8EBD0E34B7EA11F">>},
+ {<<"hackney">>, <<"DDD22D42DB2B50E6A155439C8811B8F6DF61A4395DE10509714AD2751C6DA817">>},
+ {<<"idna">>, <<"AC62EE99DA068F43C50DC69ACF700E03A62A348360126260E87F2B54ECED86B2">>},
+ {<<"metrics">>, <<"25F094DEA2CDA98213CECC3AEFF09E940299D950904393B2A29D191C346A8486">>},
+ {<<"mimerl">>, <<"993F9B0E084083405ED8252B99460C4F0563E41729AB42D9074FD5E52439BE88">>},
+ {<<"ssl_verify_fun">>, <<"EDEE20847C42E379BF91261DB474FFBE373F8ACB56E9079ACB6038D4E0BF414F">>}]}
+].
