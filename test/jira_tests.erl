@@ -10,3 +10,7 @@ init_test() ->
 
 jql_test() ->
 	"project = 'VULN' AND updated > '2016/07/06 20:34'" = jira:jql( [{ project, eq, "VULN" }, 'and', { updated, gt, { { 2016, 07, 06 }, { 20, 34, 00 } } }] ).
+
+json_get_test() ->
+	<<"Hello">> = jira:json_get( key, #{ <<"key">> => <<"Hello">> }, jira:init( "user", "password", "jira.example.com", 80, [] ) ),
+	<<"Hello">> = jira:json_get( key, #{ key => <<"Hello">> }, jira:init( "user", "password", "jira.example.com", 80, [{ labels, atom }] ) ).

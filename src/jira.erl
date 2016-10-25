@@ -3,6 +3,10 @@
 
 -export( [init/5, init/4, init/3, url/1, issue/2, search/3, search/5, jql/1] ).
 
+-ifdef( TEST ).
+-export( [json_get/3] ).
+-endif.
+
 -record( state, {   username        :: binary(),
                     password        :: binary(),
                     url             :: binary(),
@@ -72,13 +76,21 @@ search( JQL, Fields, State, StartAt, Max, Total, Out ) when StartAt =< Total ->
     
 search( _JQL, _Fields, _State, StartAt, _Max, Total, Out ) when StartAt > Total ->
     { ok, Out }.
-    
+
+json_get( Key, JSON, #state{ jsx_options = JSXOptions } ) ->
+    case lists:keyfind( labels, 1, JSXOptions ) of
+        { labels, atom }            -> maps:get( want:atom( Key ), JSON );
+        { labels, existing_atom }   -> maps:get( want:atom( Key ), JSON );
+        { labels, attempt_atom }    -> maps:get( want:atom( Key ), JSON );
+        _                           -> maps:get( want:binary( Key ), JSON )
+    end.
+
 %%
 %%  Search for any issues matching the given JQL string, starting at the given offset and returning the specified maximum number
 %%  of results. On success, returns the total number of results available as well as the list of retrieved issues.
 %%
 -spec search( string(), integer(), integer(), [binary()], #state{} ) -> { ok, [issue()] } | { error, term() }.
-search( JQL, Start, Max, Fields, #state{ username = Username, password = Password, url = BaseURL, jsx_options = JSXOptions } ) ->
+search( JQL, Start, Max, Fields, State = #state{ username = Username, password = Password, url = BaseURL, jsx_options = JSXOptions } ) ->
     Body = #{   jql         => want:binary( JQL ),
                 startAt     => Start,
                 maxResults  => Max,
@@ -90,8 +102,8 @@ search( JQL, Start, Max, Fields, #state{ username = Username, password = Passwor
         { ok, 200, _Headers, Ref } ->
             { ok, ResponseBody } = hackney:body( Ref ),
             ResponseJSON = jsx:decode( ResponseBody, lists:append( [ return_maps ], JSXOptions ) ),
-            Total   = maps:get( <<"total">>, ResponseJSON ),
-            Issues  = maps:get( <<"issues">>, ResponseJSON ),
+            Total   = json_get( <<"total">>, ResponseJSON, State ),
+            Issues  = json_get( <<"issues">>, ResponseJSON, State ),
             { ok, Issues, Total };
         { ok, _Status, _Headers, Ref } ->
             { ok, ErrorBody } = hackney:body( Ref ),
