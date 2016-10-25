@@ -23,6 +23,9 @@ search_test( Config ) ->
 	State = ?config( jira_state, Config ),
 	{ ok, Issues, _TotalResults } = jira:search( "project = " ++ ct:get_config( jira_project ), 0, 25, ["summary"], State ),
 	NewConfig = [{ issues, Issues } | Config],
+	{ { Y, M, D }, Time } = calendar:universal_time(),
+	{ ok, _Updated } = jira:search( jira:jql( [{ project, eq, ct:get_config( jira_project ) }, 'and', { updated, gt, { { Y, M, max( D - 1, 1 ) }, Time } }] ),
+													["summary"], State ),
 	{ save_config, NewConfig }.
 	
 issue_test( Config ) ->
@@ -31,7 +34,8 @@ issue_test( Config ) ->
 	Issues = ?config( issues, NewConfig ),
 	case length( Issues ) of
 		%% We don't have any issues we can retrieve by key, since the search returned an empty list
-		0 -> Config;
+		0 -> 
+			Config;
 		_ ->
 			[ First | _Rest ] = Issues,
 			Key = maps:get( <<"key">>, First ),

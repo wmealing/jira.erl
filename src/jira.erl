@@ -1,7 +1,7 @@
 -module( jira ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [init/5, init/4, init/3, url/1, issue/2, search/3, search/5] ).
+-export( [init/5, init/4, init/3, url/1, issue/2, search/3, search/5, jql/1] ).
 
 -record( state, {   username        :: binary(),
                     password        :: binary(),
@@ -99,3 +99,26 @@ search( JQL, Start, Max, Fields, #state{ username = Username, password = Passwor
         { error, Reason } ->
             { error, want:binary( Reason ) }
     end.
+
+jql( Filters ) when is_list( Filters ) ->
+    jql( Filters, "" ).
+
+jql( ['and' | T], Query ) ->
+    jql( T, string:join( [Query, "AND"], " " ) );
+
+jql( ['or' | T], Query ) ->
+    jql( T, string:join( [Query, "OR"], " " ) );
+
+jql( [{ Key, Operator, Value } | T], Query ) ->
+    jql( T, string:join( [Query, want:string( Key ), jql_operator( Operator ), jql_value( Value )], " " ) );
+
+jql( [], Query ) ->
+    string:strip( Query ).
+
+jql_operator( gt )  -> ">";
+jql_operator( lt )  -> "<";
+jql_operator( eq )  -> "=";
+jql_operator( _ )   -> "".
+
+jql_value( { { Y, M, D }, { HH, MM, _SS } } )       -> lists:flatten( io_lib:format( "'~w/~2..0w/~2..0w ~2..0w:~2..0w'", [Y, M, D, HH, MM] ) );
+jql_value( Value )                                  -> lists:append( ["'", want:string( Value ), "'" ] ).
