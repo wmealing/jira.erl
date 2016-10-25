@@ -133,4 +133,5 @@ jql_operator( eq )  -> "=";
 jql_operator( _ )   -> "".
 
 jql_value( { { Y, M, D }, { HH, MM, _SS } } )       -> lists:flatten( io_lib:format( "'~w/~2..0w/~2..0w ~2..0w:~2..0w'", [Y, M, D, HH, MM] ) );
+jql_value( { { Y, M, D }, { HH, MM, _SS, _MS } } )  -> lists:flatten( io_lib:format( "'~w/~2..0w/~2..0w ~2..0w:~2..0w'", [Y, M, D, HH, MM] ) );
 jql_value( Value )                                  -> lists:append( ["'", want:string( Value ), "'" ] ).
