@@ -11,6 +11,9 @@
     [
         kernel,
         stdlib,
+        url,
+        jsx,
+        want,
         hackney
     ]},
     { env, [] }
