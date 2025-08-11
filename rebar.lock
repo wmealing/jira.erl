@@ -1,21 +1,21 @@
-{"1.1.0",
+{"1.2.0",
 [{<<"certifi">>,{pkg,<<"certifi">>,<<"0.4.0">>},1},
  {<<"hackney">>,{pkg,<<"hackney">>,<<"1.6.1">>},0},
  {<<"idna">>,{pkg,<<"idna">>,<<"1.2.0">>},1},
  {<<"jsx">>,
-  {git,"git://github.com/talentdeficit/jsx.git",
-       {ref,"3074d4865b3385a050badf7828ad31490d860df5"}},
+  {git,"https://github.com/talentdeficit/jsx.git",
+       {ref,"1d3407aa9752430ec0a06111ac1b046ffafdca22"}},
   0},
  {<<"metrics">>,{pkg,<<"metrics">>,<<"1.0.1">>},1},
  {<<"mimerl">>,{pkg,<<"mimerl">>,<<"1.0.2">>},1},
  {<<"ssl_verify_fun">>,{pkg,<<"ssl_verify_fun">>,<<"1.1.0">>},1},
  {<<"url">>,
-  {git,"git://github.com/wrren/url.erl.git",
-       {ref,"5b06334e319da7df5cc52d9c3d54221e4f3156ac"}},
+  {git,"https://github.com/wrren/url.erl.git",
+       {ref,"218c7149c9997d10c7f179d63452f02d25376ccf"}},
   0},
  {<<"want">>,
-  {git,"git://github.com/wrren/want.erl.git",
-       {ref,"13f9f5fd2c27dac12288203caa0be3772023be91"}},
+  {git,"https://github.com/wrren/want.erl.git",
+       {ref,"7d479ed467f7e150a7b63a02eaf852b344fc9453"}},
   0}]}.
 [
 {pkg_hash,[
@@ -24,5 +24,12 @@
  {<<"idna">>, <<"AC62EE99DA068F43C50DC69ACF700E03A62A348360126260E87F2B54ECED86B2">>},
  {<<"metrics">>, <<"25F094DEA2CDA98213CECC3AEFF09E940299D950904393B2A29D191C346A8486">>},
  {<<"mimerl">>, <<"993F9B0E084083405ED8252B99460C4F0563E41729AB42D9074FD5E52439BE88">>},
- {<<"ssl_verify_fun">>, <<"EDEE20847C42E379BF91261DB474FFBE373F8ACB56E9079ACB6038D4E0BF414F">>}]}
+ {<<"ssl_verify_fun">>, <<"EDEE20847C42E379BF91261DB474FFBE373F8ACB56E9079ACB6038D4E0BF414F">>}]},
+{pkg_hash_ext,[
+ {<<"certifi">>, <<"1CC233BEE2D6990E7B0FF4C5824D7F401EDDA8A3CFAD04D3328E35AD97DE7611">>},
+ {<<"hackney">>, <<"BF0CF3F8A4BB588B14D20613A888C786655B2EB20255E328DD33F129B2D5B184">>},
+ {<<"idna">>, <<"1D724CDAFB66397E61774EAD242C9B725DE7033CDE8EA98FA4A91E64AC5EF5B3">>},
+ {<<"metrics">>, <<"69B09ADDDC4F74A40716AE54D140F93BEB0FB8978D8636EADED0C31B6F099F16">>},
+ {<<"mimerl">>, <<"7A4C8E1115A2732A67D7624E28CF6C9F30C66711A9E92928E745C255887BA465">>},
+ {<<"ssl_verify_fun">>, <<"6C0E0D857FDB031BA67B0A791202BEE116BEA2313DB7B649839000847591BA1E">>}]}
 ].
