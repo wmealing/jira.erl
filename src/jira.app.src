@@ -1,14 +1,11 @@
-{ application, jira,
-[
-    { description, "Library for making queries against the JIRA API" },
-    { vsn, "1" },
-    { modules, 
-    [
+{application, jira, [
+    {description, "Library for making queries against the JIRA API"},
+    {vsn, "1"},
+    {modules, [
         jira
     ]},
-    { registered, [] },
-    { applications, 
-    [
+    {registered, []},
+    {applications, [
         kernel,
         stdlib,
         url,
@@ -16,5 +13,5 @@
         want,
         hackney
     ]},
-    { env, [] }
- ]}.
+    {env, []}
+]}.
