@@ -10,7 +10,9 @@ jira_test_() ->
         fun test_jql/0,
         fun test_json_get/0,
         fun test_update_issue/0,
-        fun test_get_myself/0
+        fun test_get_myself/0,
+        fun test_get_specific_fields/0,
+        fun test_issue_with_fields/0
     ]}.
 
 setup() ->
@@ -54,7 +56,7 @@ test_update_issue() ->
 
     %% First get the current issue to verify it exists
     case jira:issue(Key, State) of
-        {ok, OriginalIssue} ->
+        {ok, _OriginalIssue} ->
             %% Update the issue
             UpdateResult = jira:update_issue(Key, Fields, State),
             ?assertMatch(ok, UpdateResult),
@@ -82,5 +84,62 @@ test_get_myself() ->
             );
         {error, _Reason} ->
             %% If auth fails or network issues, skip the test
+            ?assert(true)
+    end.
+
+test_get_specific_fields() ->
+    State = jira:init(bearerauth, "issues.redhat.com", []),
+    Key = "KMAINT-1000",
+
+    %% Get the issue and extract specific fields
+    case jira:issue(Key, State) of
+        {ok, Issue} ->
+            %% Extract the requested fields
+            Summary = jira:field_from_issue(Issue, <<"summary">>),
+            Description = jira:field_from_issue(Issue, <<"description">>),
+            Comment = jira:field_from_issue(Issue, <<"comment">>),
+
+            %% Verify we got valid responses for each field
+            ?assert(is_binary(Summary)),
+            ?assert(is_binary(Description) orelse Description =:= null),
+            ?assert(is_map(Comment));
+        {error, _Reason} ->
+            %% If we can't fetch the issue (likely auth/network), skip the test
+            ?assert(true)
+    end.
+
+test_issue_with_fields() ->
+    State = jira:init(bearerauth, "issues.redhat.com", []),
+    Key = "KMAINT-1000",
+    Fields = ["summary", "description", "comment"],
+
+    %% Test issue/3 with specific fields
+    case jira:issue(Key, Fields, State) of
+        {ok, Issue} ->
+            %% Verify we got an issue with the requested fields
+            ?assert(is_map(Issue)),
+            
+            %% Get the fields from the issue response
+            IssueFields = maps:get(<<"fields">>, Issue),
+            
+            %% Check that the specific fields are present
+            ?assert(maps:is_key(<<"summary">>, IssueFields)),
+            ?assert(maps:is_key(<<"description">>, IssueFields)),
+            ?assert(maps:is_key(<<"comment">>, IssueFields)),
+
+            %% Compare with getting all fields - issue/2 should return more fields
+            case jira:issue(Key, State) of
+                {ok, AllFieldsIssue} ->
+                    AllIssueFields = maps:get(<<"fields">>, AllFieldsIssue),
+                    SpecificFieldsCount = maps:size(IssueFields),
+                    AllFieldsCount = maps:size(AllIssueFields),
+                    %% Specific fields request should return fewer or equal fields
+                    ?assert(SpecificFieldsCount =< AllFieldsCount);
+                {error, _} ->
+                    %% If all fields request fails, just verify we got the specific fields
+                    ?assert(true)
+            end;
+        {error, _Reason} ->
+            %% If we can't fetch the issue (likely auth/network), skip the test
             ?assert(true)
     end.

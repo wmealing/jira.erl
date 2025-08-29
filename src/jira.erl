@@ -2,7 +2,7 @@
 -author("Warren Kenny <warren.kenny@gmail.com>").
 
 -export([
-    init/5, init/4, init/3, url/1, issue/2, search/3, search/5, jql/1, update_issue/3, get_myself/1
+    init/5, init/4, init/3, url/1, issue/2, issue/3, search/3, search/5, jql/1, update_issue/3, get_myself/1
 ]).
 
 -export([key_from_issue/1, field_from_issue/2]).
@@ -59,8 +59,16 @@ url(#state{url = URL}) -> URL.
 %%  Get the issue with the given key
 %%
 -spec issue(string(), #state{}) -> {ok, issue()} | {error, term()}.
-issue(Key, State = #state{url = BaseURL, jsx_options = JSXOptions}) ->
-    URL = want:binary(url:join(BaseURL, ["issue", Key])),
+issue(Key, State) ->
+    issue(Key, ["*all"], State).
+
+%%
+%%  Get the issue with the given key, specifying which fields to retrieve
+%%
+-spec issue(string(), [string()], #state{}) -> {ok, issue()} | {error, term()}.
+issue(Key, Fields, State = #state{url = BaseURL, jsx_options = JSXOptions}) ->
+    FieldsParam = string:join(Fields, ","),
+    URL = want:binary(url:join(BaseURL, ["issue", Key]) ++ "?fields=" ++ FieldsParam),
     {Headers, Options} = get_auth_headers_and_options(State),
     case hackney:get(URL, Headers, <<>>, Options) of
         {ok, 200, _Headers, Ref} ->
