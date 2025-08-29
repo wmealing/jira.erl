@@ -118,10 +118,10 @@ test_issue_with_fields() ->
         {ok, Issue} ->
             %% Verify we got an issue with the requested fields
             ?assert(is_map(Issue)),
-            
+
             %% Get the fields from the issue response
             IssueFields = maps:get(<<"fields">>, Issue),
-            
+
             %% Check that the specific fields are present
             ?assert(maps:is_key(<<"summary">>, IssueFields)),
             ?assert(maps:is_key(<<"description">>, IssueFields)),

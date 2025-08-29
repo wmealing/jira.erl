@@ -2,7 +2,13 @@
 -author("Warren Kenny <warren.kenny@gmail.com>").
 
 -export([
-    init/5, init/4, init/3, url/1, issue/2, issue/3, search/3, search/5, jql/1, update_issue/3, get_myself/1
+    init/5, init/4, init/3,
+    url/1,
+    issue/2, issue/3,
+    search/3, search/5,
+    jql/1,
+    update_issue/3,
+    get_myself/1
 ]).
 
 -export([key_from_issue/1, field_from_issue/2]).
