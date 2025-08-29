@@ -39,4 +39,11 @@ GetFields = [ "summary", "assignee" ],
 %% Get all results through repeated requests
 { ok, AllIssues } = jira:search( JQL, Fields, State ).
 
+%% Test authentication by getting current user info
+{ ok, UserInfo } = jira:get_myself( State ).
+
+%% Update an issue with specific fields
+UpdateFields = #{ <<"customfield_12310243">> => 11 },
+ok = jira:update_issue( "ISSUE-123", UpdateFields, State ).
+
 ```
