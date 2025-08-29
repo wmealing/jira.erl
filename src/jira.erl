@@ -144,7 +144,7 @@ search( JQL, Start, Max, Fields, State = #state{ url = BaseURL, jsx_options = JS
     Body = #{   jql         => want:binary( JQL ),
                 startAt     => Start,
                 maxResults  => Max,
-                fields      => [ want:binary( F ) || F <- Fields ]                
+                fields      => [ want:binary( F ) || F <- Fields ]
     },
     URL = want:binary( url:join( BaseURL, [ "search" ] ) ),
     {Headers, Options} = get_auth_headers_and_options(State),
