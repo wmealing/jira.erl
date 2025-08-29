@@ -1,6 +1,10 @@
 ## jira.erl
 
-JIRA client library for Erlang. Currently only supports JQL issue searching and basic authentication.
+JIRA client library for Erlang. Currently supports 
+- JQL issue searching 
+- Getting an issue. 
+- Bearer authentication
+- Basic authentication.
 
 ## Rebar Installation
 
@@ -18,7 +22,7 @@ Common Test for searching requires a valid project name under which to search fo
 
 ```erlang
 rebar compile
-rebat eunit ct
+rebat eunit 
 ```
 
 ## Examples
