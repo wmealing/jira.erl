@@ -56,7 +56,7 @@ test_update_issue() ->
             {ok, UpdatedIssue} = jira:issue(Key, State),
             UpdatedFields = jira:field_from_issue(UpdatedIssue, <<"customfield_12310243">>),
             %% JIRA may return the value as float, so check for both
-            ?assert(UpdatedFields =:= 11 orelse UpdatedFields =:= 11.0);
+            ?assert(want:integer(UpdatedFields) =:= 11);
         {error, _Reason} ->
             %% If we can't fetch the issue (likely auth/network), skip the test
             ?assert(true)
