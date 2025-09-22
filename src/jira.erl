@@ -8,7 +8,11 @@
     search/3, search/5,
     jql/1,
     update_issue/3,
-    get_myself/1
+    get_myself/1,
+    get_sprint/2,
+    get_boards/1,
+    sprints_for/2,
+    issues_in_sprint_for_board/3
 ]).
 
 -export([key_from_issue/1, field_from_issue/2]).
@@ -230,3 +234,111 @@ field_from_issue(Issue, Key) ->
     Fields = from_issue(Issue, <<"fields">>),
     #{Key := Value} = Fields,
     Value.
+
+%%
+%% Get sprint information by sprint ID using the agile API
+%%
+-spec get_sprint(#state{}, integer() | string()) -> {ok, map()} | {error, term()}.
+get_sprint(State = #state{url = BaseURL, jsx_options = JSXOptions}, SprintId) ->
+    AgileURL = binary:replace(BaseURL, <<"/rest/api/2">>, <<"/rest/agile/1.0">>),
+    URL = want:binary(url:join(AgileURL, ["sprint", want:string(SprintId)])),
+    {Headers, Options} = get_auth_headers_and_options(State),
+    case hackney:get(URL, Headers, <<>>, Options) of
+        {ok, 200, _Headers, Ref} ->
+            {ok, ResponseBody} = hackney:body(Ref),
+            Sprint = jsx:decode(ResponseBody, lists:append([return_maps], JSXOptions)),
+            {ok, Sprint};
+        {ok, _Status, _Headers, Ref} ->
+            {ok, ErrorBody} = hackney:body(Ref),
+            {error, ErrorBody};
+        {error, Reason} ->
+            {error, want:binary(Reason)}
+    end.
+
+%%
+%% Get all boards with pagination support
+%%
+-spec get_boards(#state{}) -> {ok, [map()]} | {error, term()}.
+get_boards(State) ->
+    get_boards(State, 0, 50, 100, []).
+
+-spec get_boards(#state{}, integer(), integer(), integer(), [map()]) -> 
+    {ok, [map()]} | {error, term()}.
+get_boards(State, StartAt, MaxResults, Total, Acc) when StartAt =< Total ->
+    case get_boards_page(State, StartAt, MaxResults) of
+        {ok, Boards, NewTotal, IsLast} ->
+            NewAcc = lists:append(Acc, Boards),
+            case IsLast of
+                true -> {ok, NewAcc};
+                false -> get_boards(State, StartAt + MaxResults, MaxResults, NewTotal, NewAcc)
+            end;
+        {error, Reason} -> {error, Reason}
+    end;
+get_boards(_State, StartAt, _MaxResults, Total, Acc) when StartAt > Total ->
+    {ok, Acc}.
+
+get_boards_page(State = #state{url = BaseURL, jsx_options = JSXOptions}, StartAt, MaxResults) ->
+    AgileURL = binary:replace(BaseURL, <<"/rest/api/2">>, <<"/rest/agile/1.0">>),
+    URL = want:binary(url:join(AgileURL, ["board"]) ++ 
+                     "?startAt=" ++ want:string(StartAt) ++
+                     "&maxResults=" ++ want:string(MaxResults)),
+    {Headers, Options} = get_auth_headers_and_options(State),
+    case hackney:get(URL, Headers, <<>>, Options) of
+        {ok, 200, _Headers, Ref} ->
+            {ok, ResponseBody} = hackney:body(Ref),
+            ResponseJSON = jsx:decode(ResponseBody, lists:append([return_maps], JSXOptions)),
+            Total = json_get(<<"total">>, ResponseJSON, State),
+            IsLast = json_get(<<"isLast">>, ResponseJSON, State),
+            Values = json_get(<<"values">>, ResponseJSON, State),
+            {ok, Values, Total, IsLast};
+        {ok, _Status, _Headers, Ref} ->
+            {ok, ErrorBody} = hackney:body(Ref),
+            {error, ErrorBody};
+        {error, Reason} ->
+            {error, want:binary(Reason)}
+    end.
+
+%%
+%% Get sprints for a specific board
+%%
+-spec sprints_for(#state{}, integer() | string()) -> {ok, [map()]} | {error, term()}.
+sprints_for(State = #state{url = BaseURL, jsx_options = JSXOptions}, BoardId) ->
+    AgileURL = binary:replace(BaseURL, <<"/rest/api/2">>, <<"/rest/agile/1.0">>),
+    URL = want:binary(url:join(AgileURL, ["board", want:string(BoardId), "sprint"])),
+    {Headers, Options} = get_auth_headers_and_options(State),
+    case hackney:get(URL, Headers, <<>>, Options) of
+        {ok, 200, _Headers, Ref} ->
+            {ok, ResponseBody} = hackney:body(Ref),
+            ResponseJSON = jsx:decode(ResponseBody, lists:append([return_maps], JSXOptions)),
+            Values = json_get(<<"values">>, ResponseJSON, State),
+            {ok, Values};
+        {ok, _Status, _Headers, Ref} ->
+            {ok, ErrorBody} = hackney:body(Ref),
+            {error, ErrorBody};
+        {error, Reason} ->
+            {error, want:binary(Reason)}
+    end.
+
+%%
+%% Get issues in a sprint for a specific board
+%%
+-spec issues_in_sprint_for_board(#state{}, integer() | string(), integer() | string()) -> 
+    {ok, [map()]} | {error, term()}.
+issues_in_sprint_for_board(State = #state{url = BaseURL, jsx_options = JSXOptions}, BoardId, SprintId) ->
+    AgileURL = binary:replace(BaseURL, <<"/rest/api/2">>, <<"/rest/agile/1.0">>),
+
+    URL = want:binary(url:join(AgileURL, ["board", want:string(BoardId), "sprint", want:string(SprintId), "issue"])),
+    io:format("URL: ~p~n" , [URL]),
+    {Headers, Options} = get_auth_headers_and_options(State),
+    case hackney:get(URL, Headers, <<>>, Options) of
+        {ok, 200, _Headers, Ref} ->
+            {ok, ResponseBody} = hackney:body(Ref),
+            ResponseJSON = jsx:decode(ResponseBody, lists:append([return_maps], JSXOptions)),
+            Issues = json_get(<<"issues">>, ResponseJSON, State),
+            {ok, Issues};
+        {ok, _Status, _Headers, Ref} ->
+            {ok, ErrorBody} = hackney:body(Ref),
+            {error, ErrorBody};
+        {error, Reason} ->
+            {error, want:binary(Reason)}
+    end.
