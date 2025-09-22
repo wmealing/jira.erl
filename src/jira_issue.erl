@@ -13,9 +13,7 @@
 
 %% Sprint and board data helper functions
 -export([
-    sprint_get_name/1,
-    board_get_name/2
-]).
+    sprint_get_name/1]).
 
 %%
 %% Issue Field Helper Functions
