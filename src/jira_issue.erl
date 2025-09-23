@@ -8,7 +8,8 @@
     get_assignee/1,
     get_displayname/1,
     get_summary/1,
-    get_story_points/1
+    get_story_points/1,
+    get_priority/1
 ]).
 
 %% Sprint and board data helper functions
@@ -108,9 +109,18 @@ get_story_points(Issue) ->
         error:{badmatch, _} -> null
     end.
 
+
+
+%% @doc Extract priority from JIRA issue
+%% @spec extract_priority(Issue) -> string()
+get_priority(Issue) ->
+    maps_in:get([<<"fields">>], Issue, undefined).
+
+
 %%
 %% Sprint Data Helper Functions
 %%
+
 
 %%
 %% Get the name from sprint data

@@ -12,7 +12,10 @@
     get_sprint/2,
     get_boards/1,
     sprints_for/2,
-    issues_in_sprint_for_board/3
+    issues_in_sprint_for_board/3, 
+    get_backlog/2,
+    get_backlog/3,
+    get_backlog/4
 ]).
 
 -export([key_from_issue/1, field_from_issue/2]).
@@ -64,6 +67,12 @@ init(Username, Password, Host, JSXOptions) ->
 %%
 -spec url(#state{}) -> string().
 url(#state{url = URL}) -> URL.
+
+%%
+%%  Retrieve the JSX options for the given state
+%%
+-spec jsx_options(#state{}) -> proplists:proplist().
+jsx_options(#state{jsx_options = JSXOptions}) -> JSXOptions.
 
 %%
 %%  Get the issue with the given key
@@ -220,7 +229,7 @@ get_auth_headers_and_options(#state{authtype = bearerauth}) ->
     BearerValue = <<BearerPrefix/binary, ApiKeyBinary/binary>>,
     {[{AuthKey, BearerValue}], []};
 get_auth_headers_and_options(#state{username = Username, password = Password}) ->
-    {[], [{basic_auth, {Username, Password}}]}.
+    {[], [{basic_auth, {Username, Password}, {recv_timeout, 100000}}]}.
 
 %% Helper functions.
 from_issue(Issue, Key) ->
@@ -342,3 +351,26 @@ issues_in_sprint_for_board(State = #state{url = BaseURL, jsx_options = JSXOption
         {error, Reason} ->
             {error, want:binary(Reason)}
     end.
+
+
+%%
+%% Get backlog issues for a specific board
+%%
+-spec get_backlog(#state{}, integer() | string()) -> {ok, [map()]} | {error, term()}.
+get_backlog(State, BoardId) ->
+    jira_board:get_backlog(State, BoardId).
+
+%%
+%% Get backlog issues for a specific board with starting offset
+%%
+-spec get_backlog(#state{}, integer() | string(), integer()) -> {ok, [map()]} | {error, term()}.
+get_backlog(State, BoardId, StartAt) ->
+    jira_board:get_backlog(State, BoardId, StartAt).
+
+%%
+%% Get backlog issues for a specific board with pagination parameters
+%%
+-spec get_backlog(#state{}, integer() | string(), integer(), integer()) ->
+    {ok, [map()]} | {error, term()}.
+get_backlog(State, BoardId, StartAt, MaxResults) ->
+    jira_board:get_backlog(State, BoardId, StartAt, MaxResults).

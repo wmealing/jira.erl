@@ -2,9 +2,10 @@
 
 JIRA client library for Erlang. Currently supports 
 - JQL issue searching 
-- Getting an issue. 
+- Getting an issue
+- Getting board backlog issues
 - Bearer authentication
-- Basic authentication.
+- Basic authentication
 
 ## Rebar Installation
 
@@ -49,5 +50,14 @@ GetFields = [ "summary", "assignee" ],
 %% Update an issue with specific fields
 UpdateFields = #{ <<"customfield_12310243">> => 11 },
 ok = jira:update_issue( "ISSUE-123", UpdateFields, State ).
+
+%% Get backlog issues for a board
+BoardId = 19397,
+{ ok, BacklogIssues } = jira:get_backlog( State, BoardId ).
+
+%% Get backlog issues with pagination
+StartAt = 0,
+MaxResults = 25,
+{ ok, PagedBacklogIssues } = jira:get_backlog( State, BoardId, StartAt, MaxResults ).
 
 ```
