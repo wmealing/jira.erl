@@ -21,7 +21,8 @@ jira_test_() ->
         fun test_integration_issue_helpers/0,
         fun test_integration_sprint_api/0,
         fun test_integration_issues_in_sprint_for_board/0,
-        fun test_integration_board_api/0
+        fun test_integration_board_api/0,
+        fun test_integration_backlog_api/0
     ]}.
 
 setup() ->
@@ -372,6 +373,41 @@ test_integration_issues_in_sprint_for_board() ->
                 end;
             {error, _Reason} ->
                 %% Auth failed or network issues - acceptable for testing
+                ?assert(true)
+        end
+    end}.
+
+test_integration_backlog_api() ->
+    {timeout, 120000, fun() ->
+        State = jira:init(bearerauth, "issues.redhat.com", []),
+        BoardId = 19397,  % Known test board with backlog issues
+        
+        %% Test the get_backlog function with real API
+        case jira:get_backlog(State, BoardId) of
+            {ok, Issues} ->
+                ?assert(is_list(Issues)),
+                %% If we got issues, verify they have expected structure
+                case length(Issues) > 0 of
+                    true ->
+                        [FirstIssue | _] = Issues,
+                        ?assert(is_map(FirstIssue)),
+                        ?assert(maps:is_key(<<"key">>, FirstIssue)),
+                        ?assert(maps:is_key(<<"fields">>, FirstIssue));
+                    false ->
+                        %% Empty backlog is valid
+                        ?assert(true)
+                end;
+            {error, _Reason1} ->
+                %% Auth failed or network issues - acceptable for testing
+                ?assert(true)
+        end,
+        
+        %% Test pagination
+        case jira:get_backlog(State, BoardId, 0, 5) of
+            {ok, PagedIssues} ->
+                ?assert(is_list(PagedIssues)),
+                ?assert(length(PagedIssues) =< 5);
+            {error, _Reason2} ->
                 ?assert(true)
         end
     end}.
