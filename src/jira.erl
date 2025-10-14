@@ -15,7 +15,9 @@
     issues_in_sprint_for_board/3,
     get_backlog/2,
     get_backlog/3,
-    get_backlog/4
+    get_backlog/4,
+    extract_assignee_display_name/1,
+    extract_sprint_name/1
 ]).
 
 -export([key_from_issue/1, field_from_issue/2, get_auth_headers_and_options/1, jsx_options/1]).
@@ -375,6 +377,44 @@ get_backlog(State, BoardId, StartAt) ->
 %%
 %% Get backlog issues for a specific board with pagination parameters
 %%
--spec get_backlog(#state{}, integer() | string(), integer(), integer()) -> {ok, [map()]} | {error, term()}.
+-spec get_backlog(#state{}, integer() | string(), integer(), integer()) ->
+    {ok, [map()]} | {error, term()}.
 get_backlog(State, BoardId, StartAt, MaxResults) ->
     jira_board:get_backlog(State, BoardId, StartAt, MaxResults).
+
+%%
+%% Extract the assignee display name from an issue
+%% Returns the display name or "Unassigned" if no assignee
+%%
+-spec extract_assignee_display_name(map()) -> string().
+extract_assignee_display_name(Issue) ->
+    Fields = maps:get(<<"fields">>, Issue, #{}),
+    case maps:get(<<"assignee">>, Fields, undefined) of
+        undefined -> "Unassigned";
+        null -> "Unassigned";
+        Assignee when is_map(Assignee) ->
+            DisplayName = maps:get(<<"displayName">>, Assignee, <<"Unassigned">>),
+            binary_to_list(DisplayName)
+    end.
+
+%%
+%% Extract sprint name from customfield_12310940
+%% This field contains sprint data in a special format
+%% Returns sprint name as a string or undefined if no sprint found
+%%
+-spec extract_sprint_name(map()) -> string() | undefined.
+extract_sprint_name(Issue) ->
+    Fields = maps:get(<<"fields">>, Issue, #{}),
+    case maps:get(<<"customfield_12310940">>, Fields, undefined) of
+        undefined -> undefined;
+        [] -> undefined;
+        SprintData when is_list(SprintData) ->
+            % Take the last sprint entry (most recent)
+            LastSprint = lists:last(SprintData),
+            % Parse the sprint string format: "com.atlassian.greenhopper...name=Sprint Name,..."
+            case re:run(LastSprint, "name=(.*?),", [{capture, all_but_first, list}]) of
+                {match, [SprintName]} -> SprintName;
+                _ -> undefined
+            end;
+        _ -> undefined
+    end.
