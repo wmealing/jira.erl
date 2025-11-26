@@ -390,8 +390,10 @@ get_backlog(State, BoardId, StartAt, MaxResults) ->
 extract_assignee_display_name(Issue) ->
     Fields = maps:get(<<"fields">>, Issue, #{}),
     case maps:get(<<"assignee">>, Fields, undefined) of
-        undefined -> "Unassigned";
-        null -> "Unassigned";
+        undefined ->
+            "Unassigned";
+        null ->
+            "Unassigned";
         Assignee when is_map(Assignee) ->
             DisplayName = maps:get(<<"displayName">>, Assignee, <<"Unassigned">>),
             binary_to_list(DisplayName)
@@ -406,8 +408,10 @@ extract_assignee_display_name(Issue) ->
 extract_sprint_name(Issue) ->
     Fields = maps:get(<<"fields">>, Issue, #{}),
     case maps:get(<<"customfield_12310940">>, Fields, undefined) of
-        undefined -> undefined;
-        [] -> undefined;
+        undefined ->
+            undefined;
+        [] ->
+            undefined;
         SprintData when is_list(SprintData) ->
             % Take the last sprint entry (most recent)
             LastSprint = lists:last(SprintData),
@@ -416,5 +420,6 @@ extract_sprint_name(Issue) ->
                 {match, [SprintName]} -> SprintName;
                 _ -> undefined
             end;
-        _ -> undefined
+        _ ->
+            undefined
     end.

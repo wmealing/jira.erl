@@ -380,8 +380,9 @@ test_integration_issues_in_sprint_for_board() ->
 test_integration_backlog_api() ->
     {timeout, 120000, fun() ->
         State = jira:init(bearerauth, "issues.redhat.com", []),
-        BoardId = 19397,  % Known test board with backlog issues
-        
+        % Known test board with backlog issues
+        BoardId = 19397,
+
         %% Test the get_backlog function with real API
         case jira:get_backlog(State, BoardId) of
             {ok, Issues} ->
@@ -401,7 +402,7 @@ test_integration_backlog_api() ->
                 %% Auth failed or network issues - acceptable for testing
                 ?assert(true)
         end,
-        
+
         %% Test pagination
         case jira:get_backlog(State, BoardId, 0, 5) of
             {ok, PagedIssues} ->

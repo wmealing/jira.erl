@@ -24,16 +24,17 @@ get_backlog(State, BoardId, StartAt) ->
 %%
 %% Get backlog issues for a specific board with pagination parameters
 %%
--spec get_backlog(term(), integer() | string(), integer(), integer()) -> {ok, [map()]} | {error, term()}.
+-spec get_backlog(term(), integer() | string(), integer(), integer()) ->
+    {ok, [map()]} | {error, term()}.
 get_backlog(State, BoardId, StartAt, MaxResults) ->
     BaseURL = jira:url(State),
     AgileURL = binary:replace(BaseURL, <<"/rest/api/2">>, <<"/rest/agile/1.0">>),
     URL = want:binary(
         url:join(AgileURL, ["board", want:string(BoardId), "backlog"]) ++
-        "?startAt=" ++ want:string(StartAt) ++
-        "&maxResults=" ++ want:string(MaxResults)
+            "?startAt=" ++ want:string(StartAt) ++
+            "&maxResults=" ++ want:string(MaxResults)
     ),
-    
+
     {Headers, Options} = jira:get_auth_headers_and_options(State),
     case hackney:get(URL, Headers, <<>>, Options) of
         {ok, 200, _Headers, Ref} ->
