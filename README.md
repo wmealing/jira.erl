@@ -12,7 +12,7 @@ JIRA client library for Erlang. Currently supports
 Add the following to your rebar.config:
 
 ```erlang
-{ jira, ".*",	{ git, "git://github.com/wrren/jira.erl.git", { branch, "master" } } }
+{ jira, ".*",	{ git, "git://github.com/wmealing/jira.erl.git", { branch, "master" } } }
 ```
 
 ## Running Tests

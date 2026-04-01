@@ -338,7 +338,6 @@ sprints_for(State = #state{url = BaseURL, jsx_options = JSXOptions}, BoardId) ->
 %%
 -spec issues_in_sprint_for_board(#state{}, integer() | string(), integer() | string()) ->
     {ok, [map()]} | {error, term()}.
-
 issues_in_sprint_for_board(
     State = #state{url = BaseURL, jsx_options = JSXOptions}, BoardId, SprintId
 ) ->
@@ -360,6 +359,10 @@ issues_in_sprint_for_board(
             {error, want:binary(Reason)}
     end.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 28d75db5d0277c2ee4186054590481447970c8e4
 %%
 %% Get backlog issues for a specific board
 %%
